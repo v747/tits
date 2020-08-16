@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>three.js webgl - FBX loader</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="shortcut icon" type="image/png" href="https://64.media.tumblr.com/avatar_0b78c1b3fe29_512.png"/>
+        <style>
+        body {
+        margin: 0;
+        background-color: #000;
+        color: #fff;
+        font-family: Monospace;
+        font-size: 13px;
+        line-height: 24px;
+        overscroll-behavior: none;
+        }
+        a {
+        color: #ff0;
+        text-decoration: none;
+        }
+        a:hover {
+        text-decoration: underline;
+        }
+        button {
+        cursor: pointer;
+        text-transform: uppercase;
+        }
+        canvas {
+        display: block;
+        }
+        #info {
+        position: absolute;
+        top: 0px;
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        text-align: center;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        pointer-events: none;
+        z-index: 1; /* TODO Solve this in HTML */
+        }
+        a, button, input, select {
+        pointer-events: auto;
+        }
+        .dg.ac {
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        z-index: 2 !important; /* TODO Solve this in HTML */
+        }
+        #overlay {
+        position: absolute;
+        z-index: 2;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.7);
+        }
+        #overlay button {
+        background: #ffffff;
+        border: 0;
+        color: #000000;
+        padding: 16px 20px;
+        text-transform: uppercase;
+        cursor:  pointer;
+        }
+        #notSupported {
+        width: 50%;
+        margin: auto;
+        background-color: #f00;
+        margin-top: 20px;
+        padding: 10px;
+        }
+        .blur{
+        opacity:0;
+        filter: blur(100px);
+        }
+        .no-blur{
+        transition: 1s;
+        opacity: 1
+        filter:blur(0px);
+        }
+        body {
+        background-repeat: no-repeat;
+        background-position: center;
+        background-image: url(https://wisdomeweb.com/wp-content/uploads/2019/02/All-New-CSS-Loading-Animations.png); /* Путь к фоновому изображению */
+        background-color: #111111; /* Цвет фона */
+        }
+        tumblr_controls, .tmblr-iframe{display:none !important;}
+        </style>
+    </head>
+    <body>
+        <div id='container' class="blur">
+            <div id="info">
+                Body
+            </div>
+            <script type="module">
+            import * as THREE from 'https://threejs.org/build/three.module.js';
+            import Stats from 'https://threejs.org/examples/jsm/libs/stats.module.js';
+            import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
+            import { FBXLoader } from 'https://threejs.org/examples/jsm/loaders/FBXLoader.js';
+            
+            
+            
+            var container, stats, controls;
+            var camera, scene, renderer, light,composer,savePass;
+            var clock = new THREE.Clock();
+            //add animation
+            var mixer;
+            
+            init();
+            animate();
+            var action0,action1,action2,action3;
+            var meshObject;
+            var raycaster = new THREE.Raycaster();
+            var mouse = new THREE.Vector2();
+            document.getElementById('container').onclick = function() {
+            
+            mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            raycaster.setFromCamera( mouse, camera );
+           // console.log(meshObject.children)
+            var intersects = raycaster.intersectObjects( meshObject.children );
+            if(intersects[0]!=undefined){
+            switch(intersects[0].object.name){
+                case 'right_breast':
+                action1.play().reset();
+                break;
+                case 'left_breast':
+                action3.play().reset();
+                break;
+                case 'left_butt':
+                action0.play().reset();
+                break;
+                case 'right_butt':
+                action2.play().reset();
+                break;
+
+}
+            
+        }
+
+           // console.log(intersects[0].object.name);
+
+            }
+
+
+            document.getElementById('container').addEventListener('dblclick',function(e) {
+                this.requestFullscreen();
+        });
+
+            //run once
+            function init() {
+            container = document.getElementById('container')
+            camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.3, 2000 );
+            camera.position.set( 44, 54, 286 );
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color( 0x2E2E2E );
+            scene.fog = new THREE.Fog( 0x2E2E2E , 200, 1000 );
+            var light = new THREE.AmbientLight( 'white' ); // soft white light
+            scene.add( light );
+            // scene.add( new CameraHelper( light.shadow.camera ) );
+            
+            // ground
+            var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+            mesh.rotation.x = - Math.PI / 2;
+            mesh.receiveShadow = true;
+            scene.add( mesh );
+            var grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+            grid.material.opacity = 0.2;
+            grid.material.transparent = true;
+            scene.add( grid );
+            
+            
+            //load mesh
+            var manager = new THREE.LoadingManager();
+            manager.onLoad = function ( ) {
+            container.className='no-blur'
+            };
+            var texture = new THREE.TextureLoader().load( 'body1.jpg' );
+            var material = new THREE.MeshToonMaterial( { map: texture, morphTargets: true,skinning: true } );
+            // model
+            
+            var loader = new FBXLoader(manager);
+            loader.load( 'boobs1.fbx', function ( object ) {
+            meshObject=object;
+            
+            mixer = new THREE.AnimationMixer( object );
+            action0=mixer.clipAction(object.animations[0]);
+            action0.setLoop( THREE.LoopOnce )
+            action1=mixer.clipAction(object.animations[1]);
+            action1.setLoop( THREE.LoopOnce )
+            action2=mixer.clipAction(object.animations[2]);
+            action2.setLoop(THREE.LoopOnce);
+            action3=mixer.clipAction(object.animations[3]);
+            action3.setLoop(THREE.LoopOnce);
+            
+            object.traverse( function ( child ) {
+            child.material=material;
+            });
+            
+            scene.add(object);
+            } );
+            
+            // console.log(scene.children[1]);
+            // mixer = new THREE.AnimationMixer( meshObject );
+            // clips=meshObject.animations;
+            // var clip = THREE.AnimationClip.findByName( clips, clips[0].name);
+            // var boob_R_action = mixer.clipAction( clip );
+            // boob_R_action.play();
+            
+            
+            
+            
+            renderer = new THREE.WebGLRenderer( { antialias: true } );
+          //  renderer.toneMapping = THREE.ReinhardToneMapping;
+            renderer.setPixelRatio( window.devicePixelRatio );
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            renderer.shadowMap.enabled = false;
+            container.appendChild( renderer.domElement );
+            
+            
+            controls = new OrbitControls( camera, renderer.domElement );
+            controls.target.set( 0, 100, 0 );
+            controls.update();
+            window.addEventListener( 'resize', onWindowResize, false );
+            // stats
+            stats = new Stats();
+            container.appendChild( stats.dom );
+            }
+            function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            }
+            
+            function animate() {
+            requestAnimationFrame( animate );
+            var delta = clock.getDelta();
+            if ( mixer ) mixer.update( delta );
+            renderer.render( scene, camera );
+            stats.update();
+            }
+            </script>
+        </body>
+    </html>
