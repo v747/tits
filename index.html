@@ -123,10 +123,20 @@
             var meshObject;
             var raycaster = new THREE.Raycaster();
             var mouse = new THREE.Vector2();
-            document.getElementById('container').onclick = function() {
+            window.addEventListener('touchstart',touchScreen,false);
+            window.addEventListener( 'click', touchScreen, false );
+                
+            function touchScreen() {
             
+            if(event.type=='click'){
             mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
             mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            }
+            else{
+            mouse.x = ( event.touches[0].clientX / window.innerWidth ) * 2 - 1;
+            mouse.y = - ( event.touches[0].clientY / window.innerHeight ) * 2 + 1;
+            
+            }
             raycaster.setFromCamera( mouse, camera );
            // console.log(meshObject.children)
             var intersects = raycaster.intersectObjects( meshObject.children );
