@@ -139,7 +139,7 @@ button:enabled{
             import Stats from 'https://threejs.org/examples/jsm/libs/stats.module.js';
             import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
             import { FBXLoader } from 'https://threejs.org/examples/jsm/loaders/FBXLoader.js';
-            
+            import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
             
             
             var container, stats, controls;
@@ -292,6 +292,7 @@ button:enabled{
             // stats
             stats = new Stats();
             container.appendChild( stats.dom );
+            document.body.appendChild( VRButton.createButton( renderer ) );   
             }
             function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -300,13 +301,13 @@ button:enabled{
             }
             
             function animate() {
-            requestAnimationFrame( animate );
+            renderer.setAnimationLoop( function () {
             var delta = clock.getDelta();
             if ( mixer ) mixer.update( delta );
             renderer.render( scene, camera );
             controls.update();
             stats.update();
-            }
+            }}
             </script>
         </body>
     </html>
